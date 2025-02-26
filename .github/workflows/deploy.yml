@@ -16,8 +16,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Build job
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,44 +39,17 @@ jobs:
         env:
           VITE_GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
 
+      - name: Verify build output
+        run: ls -la ./dist
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      # Use the standard upload-artifact action with a unique name
-      - name: Package site
-        uses: actions/upload-artifact@v4
-        with:
-          name: site-build-files
-          path: dist
-          retention-days: 1
-
-  # Deployment job
-  deploy:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-
-    steps:
-      # Download the artifact from the build job with the same unique name
-      - name: Download site
-        uses: actions/download-artifact@v4
-        with:
-          name: site-build-files
-          path: ./dist
-
-      - name: Setup Pages again
-        uses: actions/configure-pages@v4
-
-      # Create the GitHub Pages artifact with a specific name
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: ./dist
+          path: dist
 
-      # Deploy the GitHub Pages artifact
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v3
