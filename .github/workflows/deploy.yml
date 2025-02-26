@@ -1,12 +1,16 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [master] # Or your default branch
   workflow_dispatch: # Allow manual trigger
+  push:
+    branches: 
+      - master
 
 permissions:
-  contents: write # This permission is required for the JamesIves action
+  contents: write
+  pages: write
+  id-token: write
+  pull-requests: write
 
 jobs:
   build-and-deploy:
@@ -29,16 +33,14 @@ jobs:
         env:
           VITE_GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
 
-      - name: Verify build output
-        run: |
-          echo "Contents of dist directory:"
-          ls -la ./dist
-
-      - name: Add .nojekyll file
-        run: touch ./dist/.nojekyll
-
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v4
+  
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          folder: dist
-          # No need to specify a branch - it uses gh-pages by default
+          path: dist
+  
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
