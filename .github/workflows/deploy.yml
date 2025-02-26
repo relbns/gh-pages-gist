@@ -34,37 +34,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: List directory before build
-        run: ls -la
-
       - name: Build
         run: npm run build
         env:
-          # For the workflow to work, you'll need to add this as a repository secret
           VITE_GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
 
       - name: Check build output
         run: |
-          echo "Checking if dist directory exists:"
-          if [ -d "./dist" ]; then
-            echo "✅ dist directory exists"
-            echo "Contents of dist directory:"
-            ls -la ./dist
-          else
-            echo "❌ dist directory does not exist"
-            echo "Current directory contents:"
-            ls -la
-            exit 1
-          fi
+          echo "Contents of dist directory:"
+          ls -la ./dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        id: pages
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        id: upload-artifact
         with:
-          path: './dist'
+          name: github-pages
+          path: dist
+          retention-days: 1
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
+        with:
+          artifact_name: github-pages
