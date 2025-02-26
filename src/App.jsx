@@ -3,7 +3,7 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import GistStoragePage from './pages/GistStoragePage';
 import SettingsPage from './pages/SettingsPage';
-
+console.log('App.jsx');
 function App() {
   return (
     <HashRouter>
